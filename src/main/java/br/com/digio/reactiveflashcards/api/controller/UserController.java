@@ -8,17 +8,14 @@ import br.com.digio.reactiveflashcards.domain.service.UserService;
 import br.com.digio.reactiveflashcards.domain.service.query.UserQueryService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import static org.springframework.http.HttpStatus.CREATED;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import javax.validation.Valid;
 
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.TEXT_PLAIN;
 
 @Validated
 @RestController
@@ -47,5 +44,22 @@ public class UserController {
                 .findById(id)
                 .doFirst(() -> log.info("===== Searching a user with follow id {}", id))
                 .map(document -> userMapper.toResponse(document));
+    }
+
+    @PutMapping(consumes = APPLICATION_JSON_VALUE , produces = APPLICATION_JSON_VALUE, value = "{id}")
+    @ResponseStatus(OK)
+    public Mono<UserResponse> update (@PathVariable @Valid @MongoId(message = "{userController.id}") final String id,
+                                      @Valid @RequestBody final UserRequest requestData)
+    {
+        return userService
+                .update(userMapper.toDocument(requestData, id))
+                .doFirst(() -> log.info("==== Updating user with follow data [body: {}, id: {}]", requestData, id))
+                .map(user -> userMapper.toResponse(user));
+    }
+
+    @DeleteMapping(value = "{id}")
+    @ResponseStatus(NO_CONTENT) // pois não vou retornar nada
+    public Mono<Void> delete(@PathVariable @Valid @MongoId(message = "{userController.id}") final String id) {
+        return userService.delete(id);
     }
 }

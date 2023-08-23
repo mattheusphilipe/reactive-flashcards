@@ -4,20 +4,14 @@ import br.com.digio.reactiveflashcards.api.controller.response.ErrorFieldRespons
 import br.com.digio.reactiveflashcards.api.controller.response.ProblemResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.internal.engine.path.PathImpl;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import javax.validation.ConstraintViolationException;
-
-import java.util.Locale;
 
 import static br.com.digio.reactiveflashcards.domain.exception.BaseErrorMessage.GENERIC_BAD_REQUEST;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;

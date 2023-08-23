@@ -25,6 +25,6 @@ public record UserDocument(
        @Field("updated_at")
        OffsetDateTime updatedAt
        ) {
-    @Builder(toBuilder = true) // tem que ser aqui par anoter obm Build o REcord não deixa por na delcaração da classe
+    @Builder(toBuilder = true) // tem que ser aqui par anoter obm Build o Record não deixa por na declaração da classe
     public UserDocument {}
 }
