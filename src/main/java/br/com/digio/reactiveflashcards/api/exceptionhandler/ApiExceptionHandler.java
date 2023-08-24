@@ -1,5 +1,6 @@
 package br.com.digio.reactiveflashcards.api.exceptionhandler;
 
+import br.com.digio.reactiveflashcards.domain.exception.EmailNotUniqueException;
 import br.com.digio.reactiveflashcards.domain.exception.NotFoundException;
 import br.com.digio.reactiveflashcards.domain.exception.ReactiveFlashcardsException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -33,6 +34,8 @@ public class ApiExceptionHandler implements WebExceptionHandler {
     public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
         return Mono
                 .error(ex)
+                .onErrorResume(EmailNotUniqueException.class,
+                        e -> new EmailNotUniqueExceptionHandler(objectMapper).handlerException(exchange, e))
                 .onErrorResume(MethodNotAllowedException.class,
                         e -> new MethodNotAllowedHandler(objectMapper).handlerException(exchange, e))
                 .onErrorResume(NotFoundException.class,
@@ -41,11 +44,14 @@ public class ApiExceptionHandler implements WebExceptionHandler {
                         e-> new ResponseStatusExceptionHandler(objectMapper).handlerException(exchange, e))
                 .onErrorResume(ConstraintViolationException.class,
                         e -> new ConstraintViolationHandler(objectMapper).handlerException(exchange, e))
-                .onErrorResume(ReactiveFlashcardsException.class, e -> new ReactiveFlashcardsExceptionHandler(objectMapper).handlerException(exchange, e))
+                .onErrorResume(ReactiveFlashcardsException.class,
+                        e -> new ReactiveFlashcardsExceptionHandler(objectMapper).handlerException(exchange, e))
                 .onErrorResume(WebExchangeBindException.class,
         e -> new WebExchangeBindHandler(objectMapper, messageSource).handlerException(exchange, e))
-                .onErrorResume(Exception.class, e -> new GenericHandler(objectMapper).handlerException(exchange, e))
-                .onErrorResume(JsonProcessingException.class, e -> new JsonProcessingExceptionHandler(objectMapper).handlerException(exchange, e)) // caso ocorra algum erro de serialização com o Jackson
+                .onErrorResume(Exception.class,
+                        e -> new GenericHandler(objectMapper).handlerException(exchange, e))
+                .onErrorResume(JsonProcessingException.class,
+                        e -> new JsonProcessingExceptionHandler(objectMapper).handlerException(exchange, e)) // caso ocorra algum erro de serialização com o Jackson
                 .then(); /// pois o then retorna justamente um Mono<Void>
     }
 

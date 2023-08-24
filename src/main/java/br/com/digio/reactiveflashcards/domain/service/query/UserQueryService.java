@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.Objects;
 
+import static br.com.digio.reactiveflashcards.domain.exception.BaseErrorMessage.USER_EMAIL_NOT_UNIQUE;
 import static br.com.digio.reactiveflashcards.domain.exception.BaseErrorMessage.USER_NOT_FOUND;
 
 @Service
@@ -28,6 +29,17 @@ public class UserQueryService {
                 )); /// Mono.defer, carregamento tardio de um dados === lazy loading
                     /// Apenas com o Mono.error iria dar certo, porém
                     /// Sem o Mono.defer, o erro seria disparado toda vez ao chamar o método finbById
+
+    }
+
+    public Mono<UserDocument> findByEmail(final String email) {
+        return userRepository
+                .findByEmail(email)
+                .doFirst(() -> log.info("==== try to find user with e-mail {}", email))
+                .filter(Objects::nonNull)
+                .switchIfEmpty(Mono.defer(
+                        () -> Mono.error(new NotFoundException(USER_EMAIL_NOT_UNIQUE.params(email).getMessage()))
+                ));
 
     }
 }

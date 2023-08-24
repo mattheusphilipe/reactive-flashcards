@@ -5,6 +5,7 @@ import lombok.Builder;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Set;
 
@@ -18,8 +19,9 @@ public record DeckRequest(
         @Size(min = 1, max = 255)
         String description,
         @Valid // como é um nestedObject, tem que anotar com @Valid para as validações funcionarem
-        @JsonProperty("cards")
         @Size(min = 3)
+        @NotNull
+        @JsonProperty("cards")
         Set<CardRequest> cards
       ) {
 
