@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
@@ -28,6 +29,7 @@ public class DeckController {
     public final DeckService deckService;
     public final DeckMapper deckMapper;
     public final DeckQueryService deckQueryService;
+
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<DeckResponse> save(@Valid @RequestBody final DeckRequest request) {
@@ -44,6 +46,14 @@ public class DeckController {
     ) {
         return deckQueryService
                 .findById(id)
+                .map(deck -> deckMapper.toResponse(deck));
+    }
+
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public Flux<DeckResponse> findAll() {
+        return deckService
+                .findAll()
                 .map(deck -> deckMapper.toResponse(deck));
     }
 

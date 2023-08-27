@@ -80,7 +80,7 @@ public class ApiExceptionHandler implements WebExceptionHandler {
 
 *//* tanto o map quanto o flatMap servem para pegar algo que está sendo propagado no seu fluxo de dados e trasnformar em alguma outra coisa.
         * A diferença que que o flatMap recebe uma função que vai retornar outro tipo e ele espera um Mono, ele realiza operações não blocantes dentro do flatMap
-        * Já o Map não espera um Mono, ele trabalha co qualquer tipo, o map realiza operações blocantes.
+        * Já o Map não espera um Mono, ele trabalha com qualquer tipo, o map realiza operações blocantes.
         * No caso se seus métodos já estão preparados pra retornar Mono, já consegue tratar com o Map.
         * Nos tratamentos de dados tem que pensar se precisa trabalahr com operações não blocantes
         *//*

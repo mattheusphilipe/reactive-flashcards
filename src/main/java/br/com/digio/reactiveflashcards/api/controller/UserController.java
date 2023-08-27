@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import javax.validation.Valid;
 
@@ -34,6 +35,12 @@ public class UserController {
         return userService.save(userMapper.toDocument(request))
                 .doFirst(() -> log.info("===== Saving a user follow data {}", request))
                 .map(document -> userMapper.toResponse(document)); // basicamente faz o mapeamento de um tipo para o outro, no caso recebe o document do Save que retorna um Mono de user Document
+    }
+
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @ResponseStatus(OK)
+    public Flux<UserResponse> findAll() {
+        return userService.findAll().map(user -> userMapper.toResponse(user));
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE, value = "{id}")

@@ -8,6 +8,7 @@ import br.com.digio.reactiveflashcards.domain.service.query.UserQueryService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Objects;
@@ -48,13 +49,13 @@ public class UserService {
     * Validação para garantir que o e-mail esteja sendo utilzado apenas por um usuário
     * */
     private Mono<Void> verifyEmail(final UserDocument document) {
-//        OBS: sempre colocar as trattivas para o cenários de sucesso e no final os de insucesso
+//        OBS IMPORTANT: sempre colocar as tratativas para o cenários de sucesso e no final os de insucesso
        return userQueryService.findByEmail(document.email())
-                .filter(storedDocument -> storedDocument.id().equals(document.id()))
+               .filter(storedDocument -> storedDocument.id().equals(document.id()))
                .switchIfEmpty(
                             Mono.defer(
                             () -> Mono.error(
-                            new EmailNotUniqueException(USER_EMAIL_NOT_UNIQUE.params(document.email()).getMessage())
+                                new EmailNotUniqueException(USER_EMAIL_NOT_UNIQUE.params(document.email()).getMessage())
                             )
                         )
                )
@@ -73,7 +74,7 @@ public class UserService {
         * toda vez que queriamos tranformar nosso fluxo em outro tipo de dados, chamavamos o flatMap
         * Só que aqui nós queremos voltar um Mono<Void>, se chamassemos o flatMap ele não ia funcionar
         * flatMap não dispara excecão, ele iria seguir o fluxo, só que não iria conseguir, porque não teria o que
-        * transformar. O idel é chamar o Then, toda ve que temos um fluxo que retorna o Mono<Void> e queremos
+        * transformar. O idel é chamar o Then, toda vez que temos um fluxo que retorna o Mono<Void> e queremos
         * continuar o fluxo, chamamos o then
         *
         * */
@@ -95,5 +96,9 @@ public class UserService {
                 .findById(id)
                 .flatMap(userDocument -> userRepository.delete(userDocument))
                 .doFirst(() -> log.info("=== Trying to delete a user with follow id {}", id));
+    }
+
+    public Flux<UserDocument> findAll() {
+        return userRepository.findAll();
     }
 }

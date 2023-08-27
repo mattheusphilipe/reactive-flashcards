@@ -19,7 +19,7 @@ public record DeckDocument(
         @Id String id,
         String name,
         String description,
-        Set<StudyCard> cards, // não quero cards repetidos e  a ordenção não é relevante
+        Set<Card> cards, // não quero cards repetidos e  a ordenção não é relevante
         @CreatedDate
        @Field("created_at")
        OffsetDateTime createdAt,

@@ -5,6 +5,7 @@ import br.com.digio.reactiveflashcards.domain.repository.DeckRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -17,5 +18,9 @@ public class DeckService {
         return deckRepository
                 .save(document)
                 .doFirst(() -> log.info("==== Trying to save a follow deck {}", document));
+    }
+
+    public Flux<DeckDocument> findAll() {
+        return deckRepository.findAll().doFirst(() -> log.info("==== Trying to find all decks"));
     }
 }
