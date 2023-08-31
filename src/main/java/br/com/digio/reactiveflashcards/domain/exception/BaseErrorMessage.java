@@ -8,7 +8,6 @@ import java.util.ResourceBundle;
 
 @RequiredArgsConstructor
 public class BaseErrorMessage {
-    private final String DEFAULT_RESOURCE = "messages"; // arquivo padrão de mensagens do spring
     public static final BaseErrorMessage GENERIC_EXCEPTION = new BaseErrorMessage("generic");
     public static final BaseErrorMessage GENERIC_NOT_FOUND = new BaseErrorMessage("generic.notFound");
     public static final BaseErrorMessage GENERIC_METHOD_NOT_ALLOW = new BaseErrorMessage("generic.methodNotAllow");
@@ -16,8 +15,10 @@ public class BaseErrorMessage {
     public static final BaseErrorMessage USER_NOT_FOUND = new BaseErrorMessage("user.NotFound");
     public static final BaseErrorMessage USER_EMAIL_NOT_UNIQUE = new BaseErrorMessage("user.EmailNotUnique");
     public static final BaseErrorMessage DECK_NOT_FOUND = new BaseErrorMessage("deck.NotFound");
-    public static final BaseErrorMessage STUDY_NOT_FOUND = new BaseErrorMessage("study.NotFound");
+    public static final BaseErrorMessage STUDY_DECK_NOT_FOUND = new BaseErrorMessage("studyDeck.NotFound");
     public static final BaseErrorMessage DECK_IN_STUDY_FOUND = new BaseErrorMessage("study.DeckInStudy");
+    public static final BaseErrorMessage STUDY_NOT_FOUND = new BaseErrorMessage("study.NotFound");
+    public static final BaseErrorMessage STUDY_QUESTION_NOT_FOUND = new BaseErrorMessage("studyQuestion.NotFound");
 
     private final String key;
     private String[] params;
@@ -40,6 +41,8 @@ public class BaseErrorMessage {
         return getResource().getString(key);
     }
     public ResourceBundle getResource() {
+        // arquivo padrão de mensagens do spring
+        String DEFAULT_RESOURCE = "messages";
         return ResourceBundle.getBundle((DEFAULT_RESOURCE));
     }
 }

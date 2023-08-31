@@ -3,6 +3,7 @@ package br.com.digio.reactiveflashcards.domain.mapper;
 import br.com.digio.reactiveflashcards.domain.document.Card;
 import br.com.digio.reactiveflashcards.domain.document.Question;
 import br.com.digio.reactiveflashcards.domain.document.StudyCard;
+import org.apache.commons.lang3.ArrayUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -14,7 +15,6 @@ import java.util.Set;
 public interface StudyDomainMapper {
 
     StudyCard toStudyCard(final Card cards);
-
     default Question generateRandomQuestion(final Set<StudyCard> cards) {
         var values = new ArrayList<>(cards);
         var random = new Random();
