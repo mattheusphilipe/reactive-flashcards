@@ -1,5 +1,6 @@
 package br.com.digio.reactiveflashcards.api.exceptionhandler;
 
+import br.com.digio.reactiveflashcards.domain.exception.DeckInStudyException;
 import br.com.digio.reactiveflashcards.domain.exception.EmailNotUniqueException;
 import br.com.digio.reactiveflashcards.domain.exception.NotFoundException;
 import br.com.digio.reactiveflashcards.domain.exception.ReactiveFlashcardsException;
@@ -36,6 +37,8 @@ public class ApiExceptionHandler implements WebExceptionHandler {
                 .error(ex)
                 .onErrorResume(EmailNotUniqueException.class,
                         e -> new EmailNotUniqueExceptionHandler(objectMapper).handlerException(exchange, e))
+                .onErrorResume(DeckInStudyException.class,
+                        e -> new DeckInStudyHandler(objectMapper).handlerException(exchange, e))
                 .onErrorResume(MethodNotAllowedException.class,
                         e -> new MethodNotAllowedHandler(objectMapper).handlerException(exchange, e))
                 .onErrorResume(NotFoundException.class,

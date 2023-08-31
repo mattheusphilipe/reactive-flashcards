@@ -15,6 +15,7 @@ public interface StudyMapper {
     // se fosse mais deum parâmetro na assinatura do método então teria que dizer qual o nome do parâemtro: ex request.deckId
     @Mapping(target = "studyDeck.cards", ignore = true)
     @Mapping(target = "questions", ignore = true)
+    @Mapping(target = "question", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     StudyDocument toDocument(final StudyRequest request);

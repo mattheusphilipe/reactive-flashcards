@@ -77,6 +77,7 @@ public class UserService {
         * transformar. O idel é chamar o Then, toda vez que temos um fluxo que retorna o Mono<Void> e queremos
         * continuar o fluxo, chamamos o then
         *
+        * QUANDO QUEREMOS TAMBÉM FORÇAR UM RETORNO MONO<VOID>
         * */
         return verifyEmail(document).then(userFound
                 .map(user -> document

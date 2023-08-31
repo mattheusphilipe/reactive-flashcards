@@ -30,7 +30,7 @@ public class StudyController {
     public Mono<QuestionResponse> start(@Valid @RequestBody final StudyRequest request) {
         return studyService
                 .start(studyMapper.toDocument(request))
-                .doFirst(() -> log.info("==== Trying to create a tudy with follow data request {}", request))
+                .doFirst(() -> log.info("==== Trying to create a study with follow data request {}", request))
                 .map(document -> studyMapper.toResponse(document.getLastQuestionPending()));
     }
 }
