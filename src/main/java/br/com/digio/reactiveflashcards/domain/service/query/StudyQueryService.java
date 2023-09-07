@@ -45,14 +45,22 @@ public class StudyQueryService {
                 );
     }
 
+    public Mono<StudyDocument> verifyIfFinished(final StudyDocument document) {
+        return Mono
+                .just(document.complete())
+                .doFirst(() -> log.info("==== Verifying if study has some question without correct answer!"))
+                .filter(BooleanUtils::isFalse)
+                .switchIfEmpty(
+                        Mono.defer(() -> Mono.error(
+                                new NotFoundException(STUDY_QUESTION_NOT_FOUND.params(document.id()).getMessage())
+                        ))
+                ).thenReturn(document);
+    }
     public Mono<Question> getLastPendingQuestion(final String id) {
         return findById(id)
-                .filter(study -> BooleanUtils.isFalse(study.complete())) // verificar se tenho estudo em andamento
-                .switchIfEmpty(Mono.defer(() ->
-                        Mono.error(new NotFoundException(STUDY_QUESTION_NOT_FOUND.params(id).getMessage()))
-                ))
+                .flatMap(study -> verifyIfFinished(study)) // .thenReturn(study) para seguir com fluxo abaixo
                 .flatMapMany(study -> Flux.fromIterable(study.questions()))
-                .filter(question -> question.isAnswered())
+                .filter(question -> question.isNotAnswered())
                 .doFirst(() -> log.info("==== Getting a current pending question in study {}", id))
                 .single();
 

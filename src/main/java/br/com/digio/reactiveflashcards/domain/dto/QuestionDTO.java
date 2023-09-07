@@ -1,4 +1,4 @@
-package br.com.digio.reactiveflashcards.domain.document;
+package br.com.digio.reactiveflashcards.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -8,11 +8,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
-public record Question(
-        @Field("asked_in")
+public record QuestionDTO(
         OffsetDateTime askedIn,
         String asked,
-        @Field("answered_in")
         OffsetDateTime answeredIn,
         String answered,
         String expected // expected: correct answer
@@ -66,8 +64,8 @@ public record Question(
             return this;
         }
 
-        public Question build() {
-            return new Question(askedIn, asked, answeredIn, answered, expected);
+        public QuestionDTO build() {
+            return new QuestionDTO(askedIn, asked, answeredIn, answered, expected);
         }
     }
 

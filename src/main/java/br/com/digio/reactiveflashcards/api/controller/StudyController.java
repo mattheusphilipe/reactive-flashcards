@@ -1,6 +1,8 @@
 package br.com.digio.reactiveflashcards.api.controller;
 
+import br.com.digio.reactiveflashcards.api.controller.request.AnswerQuestionRequest;
 import br.com.digio.reactiveflashcards.api.controller.request.StudyRequest;
+import br.com.digio.reactiveflashcards.api.controller.response.AnswerQuestionResponse;
 import br.com.digio.reactiveflashcards.api.controller.response.QuestionResponse;
 import br.com.digio.reactiveflashcards.api.mapper.StudyMapper;
 import br.com.digio.reactiveflashcards.core.validation.MongoId;
@@ -34,7 +36,7 @@ public class StudyController {
         return studyService
                 .start(studyMapper.toDocument(request))
                 .doFirst(() -> log.info("==== Trying to create a study with follow data request {}", request))
-                .map(document -> studyMapper.toResponse(document.getLastQuestionPending(), document.id()));
+                .map(document -> studyMapper.toResponse(document.getLastPendingQuestion(), document.id()));
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE, value = "{id}")
@@ -45,4 +47,20 @@ public class StudyController {
                 .doFirst(() -> log.info("==== Trying to get a next question in study {}", id))
                 .map(question -> studyMapper.toResponse(question, id));
     }
+
+    @PostMapping(produces = APPLICATION_JSON_VALUE, consumes = APPLICATION_JSON_VALUE, value = "{id}/answer")
+    @ResponseStatus(HttpStatus.OK)
+    public Mono<AnswerQuestionResponse> answer(
+            @Valid @PathVariable @MongoId(message = "{studyController.id}") final String id,
+            @Valid @RequestBody final AnswerQuestionRequest request
+            ) {
+
+        var answer = request.answer();
+        return studyService.answer(id, answer)
+                .doFirst(() -> log.info("==== Trying to answer pending question in study {} with {}", id, answer))
+                .map(
+                        document -> studyMapper.toResponse(document.getLastAnsweredQuestion())
+                );
+    }
+
 }
