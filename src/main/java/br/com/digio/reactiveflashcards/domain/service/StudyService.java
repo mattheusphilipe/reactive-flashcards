@@ -1,5 +1,6 @@
 package br.com.digio.reactiveflashcards.domain.service;
 
+import br.com.digio.reactiveflashcards.api.mapper.MailMapper;
 import br.com.digio.reactiveflashcards.domain.document.Card;
 import br.com.digio.reactiveflashcards.domain.document.Question;
 import br.com.digio.reactiveflashcards.domain.document.StudyCard;
@@ -33,11 +34,14 @@ import static br.com.digio.reactiveflashcards.domain.exception.BaseErrorMessage.
 @Slf4j
 public class StudyService {
 
+    private final MailService mailService;
     private final UserQueryService userQueryService;
     private final DeckQueryService deckQueryService;
     private final StudyQueryService studyQueryService;
+
     private final StudyRepository studyRepository;
     private final StudyDomainMapper studyDomainMapper;
+    private final MailMapper mailMapper;
 
     // iniciar estudos
     public Mono<StudyDocument> start(final StudyDocument document) {
@@ -93,9 +97,8 @@ public class StudyService {
     public Mono<StudyDocument> answer(final String id, final String answer) {
 /*
     ficar atento a thenReturn quando tiver que propagar exception
-  .flatMap(study -> studyQueryService.verifyIfFinished(study).thenReturn(study)) // se i thenReturn ficar aqui, ele vai ignorar uma possível excetion dentro do verifyIfFnished
+  .flatMap(study -> studyQueryService.verifyIfFinished(study).thenReturn(study)) // se o thenReturn ficar aqui, ele vai ignorar uma possível excetion dentro do verifyIfFnished
 */
-
 
         // primeiro passo, responder a nossa questão
        return studyQueryService.findById(id) // procura o nosso estudo
@@ -147,8 +150,8 @@ public class StudyService {
                             () ->
                                     Mono.just(
                                             asks
-                                                    .stream().
-                                                    filter(a -> !a.equals(asked))
+                                                    .stream()
+                                                    .filter(a -> !a.equals(asked))
                                                     .collect(Collectors.toList())
                                     )
                     )
@@ -169,7 +172,12 @@ public class StudyService {
                     )
                 ).flatMap(hasAnyAnswer -> generateNextQuestion(dto))
                 .map(question -> dto.toBuilder().question(question).build())// adiciona rminha nova pergunta as outras
-                .onErrorResume(NotFoundException.class, e -> Mono.just(dto));
+                .onErrorResume(NotFoundException.class, e ->
+                        Mono
+                                .just(dto)
+                                .onTerminateDetach() // desanexar emissão quando terminar
+                                .doOnSuccess(this::notifyUser)
+                );
     }
     private Mono<QuestionDTO> generateNextQuestion(final StudyDTO dto) {
         /*
@@ -193,5 +201,18 @@ public class StudyService {
                         .findFirst()
                         .orElseThrow()
                 );
+    }
+
+    private void notifyUser(final StudyDTO dto) {
+
+        // enviar o e-mail sem segundo plano,
+        // não ter que fazer esperar o envio do e-mail após o usuário concluir o estudo
+        // por isso sem retorno e coloco a subscrição no evento.
+
+        userQueryService.findById(dto.userId())
+                .zipWhen(user -> deckQueryService.findById(dto.studyDeck().deckId()))
+                .map(tuple -> mailMapper.toDTO(dto, tuple.getT2(), tuple.getT1()))
+                .flatMap(mailService::send)
+                .subscribe();
     }
 }

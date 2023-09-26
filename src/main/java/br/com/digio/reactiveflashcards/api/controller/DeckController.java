@@ -2,6 +2,7 @@ package br.com.digio.reactiveflashcards.api.controller;
 
 
 import br.com.digio.reactiveflashcards.api.controller.request.DeckRequest;
+import br.com.digio.reactiveflashcards.api.controller.request.UserRequest;
 import br.com.digio.reactiveflashcards.api.controller.response.DeckResponse;
 import br.com.digio.reactiveflashcards.api.mapper.DeckMapper;
 import br.com.digio.reactiveflashcards.core.validation.MongoId;
@@ -17,6 +18,8 @@ import reactor.core.publisher.Mono;
 
 import javax.validation.Valid;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @Validated
@@ -39,6 +42,12 @@ public class DeckController {
                 .map(document -> deckMapper.toResponse(document));
     }
 
+    @PostMapping(value = "sync")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public Mono<Void> sync() {
+        return deckService.sync();
+    }
+
     @GetMapping(produces = APPLICATION_JSON_VALUE, value = "{id}")
     @ResponseStatus(HttpStatus.OK)
     public Mono<DeckResponse> findById(
@@ -57,4 +66,19 @@ public class DeckController {
                 .map(deck -> deckMapper.toResponse(deck));
     }
 
+    @PutMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE, value = "{id}")
+    @ResponseStatus(OK)
+    public Mono<DeckResponse> update(@PathVariable @Valid @MongoId(message = "{deckController.id}") final String id,
+                                     @Valid @RequestBody final DeckRequest requestData
+    ) {
+        return deckService
+                .update(deckMapper.toDocument(requestData, id))
+                .map(deck -> deckMapper.toResponse(deck));
+    }
+
+    @DeleteMapping(value = "{id}")
+    @ResponseStatus(NO_CONTENT) // pois não vou retornar nada
+    public Mono<Void> delete(@PathVariable @Valid @MongoId(message = "{deckController.id}") final String id) {
+        return deckService.delete(id);
+    }
 }

@@ -4,5 +4,30 @@ spring:
   data:
     mongodb:
       uri: mongodb://reactive-flashcards:reactive-flashcards@db:27017/reactive-flashcards?authSource=admin
-
+  mail:
+    host: mailcatcher
       # usuário e senha e nome da coleção: reactive-flashcards
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          port: 25
+
+reactive-flashcards:
+  mail:
+    sender: Reactive Flashcards <noreply@reactiveflashcards.com.br>
+
+retry-config:
+  max-retries: 3
+  min-duration: 1
+
+http-client:
+  response-timeout: 30000
+  read-timeout: 30000
+
+deck-api:
+  base-url: external:3000  #http://localhost:3000 dois docker compose não enxergam localhost
+  auth-resource: auth
+  decks-resource: decks
+

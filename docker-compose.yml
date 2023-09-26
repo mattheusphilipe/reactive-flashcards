@@ -27,6 +27,11 @@ services:
     image: busybox
     volumes:
       - /box
+  mailcatcher: # nome do cantainer
+   image: tophfr/mailcatcher
+   ports:
+     - "1025:25" #1025 máquina real, com 25 da do container
+     - "1080:80"
 volumes:
   db:
   box:
