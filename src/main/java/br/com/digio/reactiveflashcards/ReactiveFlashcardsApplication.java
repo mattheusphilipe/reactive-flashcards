@@ -11,12 +11,12 @@ public class ReactiveFlashcardsApplication {
 
 	public static void main(String[] args) {
 
-		SignatureType signatureType = SignatureType.NAO_ASSINADO;
-		SignatureType signatureType2 = SignatureType.DIGITAL;
+		SignatureType signatureTypeNotSigned = SignatureType.NAO_ASSINADO;
+		SignatureType signatureTypeDigital = SignatureType.DIGITAL;
 
-		for(SignatureType s : SignatureType.values()) {
-			System.out.println("Name: " + s.name());
-			System.out.println("Value: " + s.getValue());
+		for(SignatureType sig : SignatureType.values()) {
+			System.out.println("Name: " + sig.name());
+			System.out.println("Value: " + sig.getValue());
 		}
 		SpringApplication.run(ReactiveFlashcardsApplication.class, args);
 
